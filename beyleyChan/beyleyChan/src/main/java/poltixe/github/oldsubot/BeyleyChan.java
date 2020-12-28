@@ -15,8 +15,6 @@ import poltixe.github.flanchobotlibrary.*;
 import poltixe.github.flanchobotlibrary.packets.*;
 
 public class BeyleyChan extends BotClient {
-    PacketSender packetSender = null;
-
     public BeyleyChan(String username, String plainPassword, char prefix) {
         super(username, plainPassword, prefix);
     }
@@ -70,14 +68,20 @@ public class BeyleyChan extends BotClient {
 
                     Iterator<?> allUsers = ja.iterator();
 
-                    int lastScore = Integer.parseInt((String) ((JSONObject) ja.get(0)).get("ranked_score"));
+                    long lastScore = Long.parseLong((String) ((JSONObject) ja.get(0)).get("ranked_score"));
 
                     String returnMessage = "";
 
                     for (int i = 0; i < 10; i++) {
+                        char zwsp = '\u200B';
+
+                        StringBuffer playerUsername = new StringBuffer(
+                                (String) ((JSONObject) ja.get(i)).get("username"));
+
+                        // playerUsername.insert(1, zwsp);
+
                         returnMessage = String.format("#%s | %s | Score:%,.0f",
-                                (String) ((JSONObject) ja.get(i)).get("rank"),
-                                (String) ((JSONObject) ja.get(i)).get("username"),
+                                (String) ((JSONObject) ja.get(i)).get("rank"), playerUsername.toString(),
                                 Double.parseDouble((String) ((JSONObject) ja.get(i)).get("ranked_score")));
 
                         if (i > 0) {
@@ -85,7 +89,7 @@ public class BeyleyChan extends BotClient {
                                     - Double.parseDouble((String) ((JSONObject) ja.get(i)).get("ranked_score")));
                         }
 
-                        lastScore = Integer.parseInt((String) ((JSONObject) ja.get(i)).get("ranked_score"));
+                        lastScore = Long.parseLong((String) ((JSONObject) ja.get(i)).get("ranked_score"));
 
                         packetSender.sendMessage(username, returnMessage, target);
 
