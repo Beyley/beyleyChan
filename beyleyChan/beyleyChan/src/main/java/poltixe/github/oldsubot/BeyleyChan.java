@@ -197,6 +197,12 @@ public class BeyleyChan extends BotClient {
                         JSONObject user = (JSONObject) allUsers.next();
 
                         if (user.get("username").equals(sender)) {
+                            if (Integer.parseInt((String) user.get("rank")) == 1) {
+                                returnMessage = "ShadowOfDark fuck you lmaooooo (jk luv ya <3)";
+
+                                break;
+                            }
+
                             int userAboveIndex = Integer.parseInt((String) user.get("rank")) - 2;
 
                             JSONObject userAbove = (JSONObject) ja.get(userAboveIndex);
