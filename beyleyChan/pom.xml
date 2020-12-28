@@ -11,6 +11,6 @@
 
     <modules>
         <module>flanchoBotLibrary/flanchoBotLibrary/pom.xml</module>
-        <module>oldsubot/pom.xml</module>
+        <module>beyleyChan/pom.xml</module>
     </modules>
 </project>
