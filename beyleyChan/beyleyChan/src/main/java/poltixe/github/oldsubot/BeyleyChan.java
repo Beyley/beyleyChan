@@ -28,10 +28,10 @@ public class BeyleyChan extends BotClient {
                             "Hello! I'm Beyley-chan, PoltixeTheDerg's bot. (name literally comes from her real name lmao)",
                             "Currently I'm in early stages of development so I can't do much yet!",
                             "The currently Available commands are as following:",
-                            ":" + prefix + "top10 : Lists the top 10 players",
-                            ":" + prefix + "nextrank : Shows the required score to reach the next rank",
-                            ":" + prefix + "u : Shows basic stats about you",
-                            ":" + prefix + "help : You are currently looking at this!!" };
+                            ": " + prefix + "top10 : Lists the top 10 players",
+                            ": " + prefix + "nextrank : Shows the required score to reach the next rank",
+                            ": " + prefix + "u : Shows basic stats about you",
+                            ": " + prefix + "help : You are currently looking at this!!" };
                     for (String helpString : HelpMessages) {
                         packetSender.sendMessage(username, helpString, target);
                     }
