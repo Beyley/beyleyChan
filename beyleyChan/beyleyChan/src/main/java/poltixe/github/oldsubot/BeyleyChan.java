@@ -15,7 +15,7 @@ import poltixe.github.flanchobotlibrary.packets.*;
 import poltixe.github.flanchobotlibrary.shortcuts.Time;
 
 public class BeyleyChan extends BotClient {
-    User[] oldsuTop10 = new User[10];
+    User[] oldsuTopPlayers = new User[11];
 
     public BeyleyChan(String username, String plainPassword, char prefix) {
         super(username, plainPassword, prefix);
@@ -242,12 +242,12 @@ public class BeyleyChan extends BotClient {
                     JSONObject jo = (JSONObject) paresdJson;
                     JSONArray ja = (JSONArray) jo.get("users");
 
-                    User[] oldUserArray = Arrays.copyOf(oldsuTop10, 10);
+                    User[] oldUserArray = Arrays.copyOf(oldsuTopPlayers, 10);
 
-                    for (int i = 0; i < 10; i++) {
+                    for (int i = 0; i < 11; i++) {
                         JSONObject thisUser = (JSONObject) ja.get(i);
 
-                        oldsuTop10[i] = new User((String) thisUser.get("username"), (Long) thisUser.get("userId"),
+                        oldsuTopPlayers[i] = new User((String) thisUser.get("username"), (Long) thisUser.get("userId"),
                                 Long.parseLong((String) thisUser.get("ranked_score")),
                                 Integer.parseInt((String) thisUser.get("rank")));
                     }
@@ -255,15 +255,15 @@ public class BeyleyChan extends BotClient {
                     if (oldUserArray[0] != null) {
                         boolean skip = false;
 
-                        for (int i = 0; i < oldsuTop10.length; i++) {
+                        for (int i = 0; i < 10; i++) {
                             if (skip) {
                                 skip = false;
                                 continue;
                             }
 
-                            if (!oldsuTop10[i].username.equals(oldUserArray[i].username)) {
+                            if (!oldsuTopPlayers[i].username.equals(oldUserArray[i].username)) {
                                 User oldUser = oldUserArray[i];
-                                User newUser = oldsuTop10[i];
+                                User newUser = oldsuTopPlayers[i];
 
                                 packetSender.sendMessage(username,
                                         String.format("%s has overtaken %s for rank %,.0f with a %,.0f score play!",
