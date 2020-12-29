@@ -15,6 +15,8 @@ import poltixe.github.flanchobotlibrary.packets.*;
 import poltixe.github.flanchobotlibrary.shortcuts.Time;
 
 public class BeyleyChan extends BotClient {
+    User[] oldsuTop10 = new User[10];
+
     public BeyleyChan(String username, String plainPassword, char prefix) {
         super(username, plainPassword, prefix);
     }
@@ -32,6 +34,7 @@ public class BeyleyChan extends BotClient {
                             ": " + prefix + "nextrank : Shows the required score to reach the next rank",
                             ": " + prefix + "u : Shows basic stats about you",
                             ": " + prefix + "help : You are currently looking at this!!" };
+
                     for (String helpString : HelpMessages) {
                         packetSender.sendMessage(username, helpString, target);
                     }
@@ -58,7 +61,6 @@ public class BeyleyChan extends BotClient {
 
                     JSONObject jo = (JSONObject) paresdJson;
 
-                    // getting phoneNumbers
                     JSONArray ja = (JSONArray) jo.get("users");
 
                     Iterator<?> allUsers = ja.iterator();
@@ -224,14 +226,63 @@ public class BeyleyChan extends BotClient {
         packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with Flan-chan in the fields!");
 
         Timer timer = new Timer();
-        // Timer starts after 25 seconds.
-        int begin = 25000;
-        // Timer executes every 25 seconds.
-        int timeinterval = 25000;
+
+        // Schedule the user rank check
+        timer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    HttpClient httpClient = HttpClient.newHttpClient();
+                    HttpRequest request = HttpRequest.newBuilder()
+                            .uri(URI.create("https://oldsu.ayyeve.xyz/api/global_leaderboard/")).build();
+
+                    HttpResponse<String> response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
+                    String json = response.body();
+                    Object paresdJson = new JSONParser().parse(json);
+                    JSONObject jo = (JSONObject) paresdJson;
+                    JSONArray ja = (JSONArray) jo.get("users");
+
+                    User[] oldUserArray = Arrays.copyOf(oldsuTop10, 10);
+
+                    for (int i = 0; i < 10; i++) {
+                        JSONObject thisUser = (JSONObject) ja.get(i);
+
+                        oldsuTop10[i] = new User((String) thisUser.get("username"), (Long) thisUser.get("userId"),
+                                Long.parseLong((String) thisUser.get("ranked_score")),
+                                Integer.parseInt((String) thisUser.get("rank")));
+                    }
+
+                    if (oldUserArray[0] != null) {
+                        boolean skip = false;
+
+                        for (int i = 0; i < oldsuTop10.length; i++) {
+                            if (skip) {
+                                skip = false;
+                                continue;
+                            }
+
+                            if (!oldsuTop10[i].username.equals(oldUserArray[i].username)) {
+                                User oldUser = oldUserArray[i];
+                                User newUser = oldsuTop10[i];
+
+                                packetSender.sendMessage(username,
+                                        String.format("%s has overtaken %s for rank %,.0f with a %,.0f score play!",
+                                                newUser.username, oldUser.username, (double) newUser.rank,
+                                                (double) newUser.rankedScore - oldUserArray[i + 1].rankedScore),
+                                        "#announce");
+
+                                skip = true;
+                            }
+                        }
+                    }
+                } catch (IOException | ParseException | InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        }, 0, 10000);
 
         // Schedule the keepalive / userstatus packet
         timer.scheduleAtFixedRate(new TimerTask() {
-
             @Override
             public void run() {
                 LocalDateTime now = LocalDateTime.now();
@@ -319,6 +370,6 @@ public class BeyleyChan extends BotClient {
                         break;
                 }
             }
-        }, begin, timeinterval);
+        }, 25000, 25000);
     }
 }
