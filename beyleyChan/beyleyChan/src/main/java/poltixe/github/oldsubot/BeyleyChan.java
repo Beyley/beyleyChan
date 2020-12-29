@@ -269,7 +269,7 @@ public class BeyleyChan extends BotClient {
                                         String.format("%s has overtaken %s for rank %,.0f with a %,.0f score play!",
                                                 newUser.username, oldUser.username, (double) newUser.rank,
                                                 (double) newUser.rankedScore - oldUserArray[i + 1].rankedScore),
-                                        "#announce");
+                                        "#osu");
 
                                 skip = true;
                             }
