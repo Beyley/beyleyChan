@@ -11,7 +11,7 @@ public class App {
 
         try {
             new Thread(() -> {
-                BeyleyChan flanchoBot = new BeyleyChan("Beyley-chan", cfg.getProperty("userPassword"), '@');
+                BeyleyChan flanchoBot = new BeyleyChan(cfg.getProperty("userName"), cfg.getProperty("userPassword"), '@');
 
                 flanchoBot.showLocationData = true;
                 flanchoBot.ip = cfg.getProperty("ip");

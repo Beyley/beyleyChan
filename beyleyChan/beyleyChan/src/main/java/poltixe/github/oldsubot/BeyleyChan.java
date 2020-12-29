@@ -1,7 +1,6 @@
 package poltixe.github.oldsubot;
 
 import java.io.*;
-import java.lang.management.ManagementFactory;
 import java.net.*;
 import java.net.http.*;
 import java.time.*;
@@ -13,6 +12,7 @@ import org.json.simple.parser.*;
 
 import poltixe.github.flanchobotlibrary.*;
 import poltixe.github.flanchobotlibrary.packets.*;
+import poltixe.github.flanchobotlibrary.shortcuts.Time;
 
 public class BeyleyChan extends BotClient {
     public BeyleyChan(String username, String plainPassword, char prefix) {
@@ -20,25 +20,21 @@ public class BeyleyChan extends BotClient {
     }
 
     @Override
-    public void onPrefixedMessage(String sender, String target, String message) {
+    public void onCommandMessage(String sender, String target, String command, String arguments) {
         try {
-            switch (message.split(" ")[0].substring(1)) {
+            switch (command) {
                 case "help":
                     String[] HelpMessages = new String[] {
                             "Hello! I'm Beyley-chan, PoltixeTheDerg's bot. (name literally comes from her real name lmao)",
                             "Currently I'm in early stages of development so I can't do much yet!",
                             "The currently Available commands are as following:",
-                            prefix + "top10 : Lists the top 10 players",
-                            prefix + "nextrank : Shows the required score to reach the next rank",
-                            prefix + "u : Shows basic stats about you",
-                            prefix + "help : You are currently looking at this!!" };
+                            ":" + prefix + "top10 : Lists the top 10 players",
+                            ":" + prefix + "nextrank : Shows the required score to reach the next rank",
+                            ":" + prefix + "u : Shows basic stats about you",
+                            ":" + prefix + "help : You are currently looking at this!!" };
                     for (String helpString : HelpMessages) {
                         packetSender.sendMessage(username, helpString, target);
-
-                        Thread.sleep(50);
                     }
-
-                    Thread.sleep(500);
 
                     break;
                 case "top10a":
@@ -55,8 +51,7 @@ public class BeyleyChan extends BotClient {
 
                         // print response body
                         json = response.body();
-                    } catch (IOException ex) {
-                    } catch (InterruptedException ex) {
+                    } catch (IOException | InterruptedException ex) {
                     }
 
                     Object paresdJson = new JSONParser().parse(json);
@@ -73,12 +68,8 @@ public class BeyleyChan extends BotClient {
                     String returnMessage = "";
 
                     for (int i = 0; i < 10; i++) {
-                        char zwsp = '\u200B';
-
                         StringBuffer playerUsername = new StringBuffer(
                                 (String) ((JSONObject) ja.get(i)).get("username"));
-
-                        // playerUsername.insert(1, zwsp);
 
                         returnMessage = String.format("#%s | %s | Score:%,.0f",
                                 (String) ((JSONObject) ja.get(i)).get("rank"), playerUsername.toString(),
@@ -92,8 +83,6 @@ public class BeyleyChan extends BotClient {
                         lastScore = Long.parseLong((String) ((JSONObject) ja.get(i)).get("ranked_score"));
 
                         packetSender.sendMessage(username, returnMessage, target);
-
-                        Thread.sleep(50);
                     }
 
                     break;
@@ -162,8 +151,6 @@ public class BeyleyChan extends BotClient {
 
                     for (String helpString : returnMessages) {
                         packetSender.sendMessage(username, helpString, target);
-
-                        Thread.sleep(50);
                     }
 
                     break;
@@ -221,8 +208,12 @@ public class BeyleyChan extends BotClient {
                     packetSender.sendMessage(username, returnMessage, target);
 
                     break;
+                default:
+                    packetSender.sendMessage(username,
+                            "That command does not exist! Type @help for a list of commands!", target);
+                    break;
             }
-        } catch (IOException | InterruptedException | ParseException e) {
+        } catch (ParseException e) {
         }
     }
 
@@ -230,10 +221,7 @@ public class BeyleyChan extends BotClient {
     public void onAuthComplete() {
         this.packetSender = new PacketSender(client);
 
-        try {
-            packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with Flan-chan in the fields!");
-        } catch (IOException e) {
-        }
+        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with Flan-chan in the fields!");
 
         Timer timer = new Timer();
         // Timer starts after 25 seconds.
@@ -243,96 +231,92 @@ public class BeyleyChan extends BotClient {
 
         // Schedule the keepalive / userstatus packet
         timer.scheduleAtFixedRate(new TimerTask() {
-            boolean setNewStatus = false;
 
             @Override
             public void run() {
-                try {
-                    if (setNewStatus) {
-                        int randomNumber = rand.nextInt(21);
+                LocalDateTime now = LocalDateTime.now();
 
-                        switch (randomNumber) {
-                            case 0:
-                                packetSender.updateStatus(SendUserStatusPacket.PLAYING,
-                                        "with Flan-chan in the fields!");
-                                break;
-                            case 1:
-                                long jvmUpTime = ManagementFactory.getRuntimeMXBean().getUptime();
+                if (now.getHour() > 15 && now.getHour() < 19) {
+                    packetSender.updateStatus(SendUserStatusPacket.PLAYING,
+                            "nothing, but cuddling eevee till they fall asleep, cus cuties need sleep");
 
-                                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+                    return;
+                }
 
-                                LocalDateTime date = Instant.ofEpochMilli(jvmUpTime).atZone(ZoneId.systemDefault())
-                                        .toLocalDateTime();
+                int randomNumber = rand.nextInt(21);
 
-                                packetSender.updateStatus(SendUserStatusPacket.PLAYING,
-                                        String.format("Visual Studio Code for %s", dtf.format(date)));
-                                break;
-                            case 2:
-                                packetSender.updateStatus(SendUserStatusPacket.PLAYING, "oldsu!");
-                                break;
-                            case 3:
-                                packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with eve owo");
-                                break;
-                            case 4:
-                                packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with thighs");
-                                break;
-                            case 5:
-                                packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with thingies ;)");
-                                break;
-                            case 6:
-                                packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with uleb128-chan");
-                                break;
-                            case 7:
-                                packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with you >^<");
-                                break;
-                            case 8:
-                                packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with a cutie");
-                                break;
-                            case 9:
-                                packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with UserStatus packets");
-                                break;
-                            case 10:
-                                packetSender.updateStatus(SendUserStatusPacket.WATCHING, "eve code while blushing");
-                                break;
-                            case 11:
-                                packetSender.updateStatus(SendUserStatusPacket.WATCHING, "the haitai background");
-                                break;
-                            case 12:
-                                packetSender.updateStatus(SendUserStatusPacket.MULTIPLAYING, "with the girls");
-                                break;
-                            case 13:
-                                packetSender.updateStatus(SendUserStatusPacket.EDITING, "her github profile");
-                                break;
-                            case 14:
-                                packetSender.updateStatus(SendUserStatusPacket.WATCHING, "you");
-                                break;
-                            case 15:
-                                packetSender.updateStatus(SendUserStatusPacket.SUBMITTING,
-                                        "her love confession to eve");
-                                break;
-                            case 16:
-                                packetSender.updateStatus(SendUserStatusPacket.SUBMITTING,
-                                        "her love confession to eevee");
-                                break;
-                            case 17:
-                                packetSender.updateStatus(SendUserStatusPacket.EDITING, "her love confession to eve");
-                                break;
-                            case 18:
-                                packetSender.updateStatus(SendUserStatusPacket.EDITING, "her love confession to eevee");
-                                break;
-                            case 19:
-                                packetSender.updateStatus(SendUserStatusPacket.MODDING, "her body to appeal to eve");
-                                break;
-                            case 20:
-                                packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with ur bits, look down");
-                                break;
-                        }
+                switch (randomNumber) {
+                    case 0:
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with Flan-chan in the fields!");
+                        break;
+                    case 1:
+                        long jvmUpTime = Time.getJVMUptime();
 
-                        setNewStatus = false;
-                    } else {
-                        setNewStatus = true;
-                    }
-                } catch (IOException e) {
+                        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+                        LocalDateTime date = Instant.ofEpochMilli(jvmUpTime).atZone(ZoneId.systemDefault())
+                                .toLocalDateTime();
+
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING,
+                                String.format("Visual Studio Code for %s", dtf.format(date)));
+                        break;
+                    case 2:
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "oldsu!");
+                        break;
+                    case 3:
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with eve owo");
+                        break;
+                    case 4:
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with thighs");
+                        break;
+                    case 5:
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with thingies ;)");
+                        break;
+                    case 6:
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with uleb128-chan");
+                        break;
+                    case 7:
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with you >^<");
+                        break;
+                    case 8:
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with a cutie");
+                        break;
+                    case 9:
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with UserStatus packets");
+                        break;
+                    case 10:
+                        packetSender.updateStatus(SendUserStatusPacket.WATCHING, "eve code while blushing");
+                        break;
+                    case 11:
+                        packetSender.updateStatus(SendUserStatusPacket.WATCHING, "the haitai background");
+                        break;
+                    case 12:
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with the girls");
+                        break;
+                    case 13:
+                        packetSender.updateStatus(SendUserStatusPacket.EDITING, "her github profile");
+                        break;
+                    case 14:
+                        packetSender.updateStatus(SendUserStatusPacket.WATCHING, "you");
+                        break;
+                    case 15:
+                        packetSender.updateStatus(SendUserStatusPacket.SUBMITTING, "her love confession to eve");
+                        break;
+                    case 16:
+                        packetSender.updateStatus(SendUserStatusPacket.SUBMITTING, "her love confession to eevee");
+                        break;
+                    case 17:
+                        packetSender.updateStatus(SendUserStatusPacket.EDITING, "her love confession to eve");
+                        break;
+                    case 18:
+                        packetSender.updateStatus(SendUserStatusPacket.EDITING, "her love confession to eevee");
+                        break;
+                    case 19:
+                        packetSender.updateStatus(SendUserStatusPacket.MODDING, "her body to appeal to eve");
+                        break;
+                    case 20:
+                        packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with ur bits, look down");
+                        break;
                 }
             }
         }, begin, timeinterval);
