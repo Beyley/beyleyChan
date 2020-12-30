@@ -372,4 +372,10 @@ public class BeyleyChan extends BotClient {
             }
         }, 25000, 25000);
     }
+
+    @Override
+    public void onMessage(String arg0, String arg1, String arg2) {
+        // TODO Auto-generated method stub
+
+    }
 }
