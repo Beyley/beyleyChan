@@ -283,7 +283,7 @@ public class BeyleyChan extends BotClient {
 
         // Schedule the keepalive / userstatus packet
         timer.scheduleAtFixedRate(new TimerTask() {
-            boolean newYearSent = false;
+            int newYearSent = -1;
             
             @Override
             public void run() {
@@ -293,9 +293,9 @@ public class BeyleyChan extends BotClient {
                     packetSender.updateStatus(SendUserStatusPacket.PLAYING,
                             "nothing while cuddling everyone to celebrate the new year!");
 
-                    if(!newYearSent) {
+                    if(newYearSent != now.getHour()) {
                         packetSender.sendMessage(username, "Happy new year everyone! Hope everyone gets lots of cuddles and hugs this year!", "#osu"); 
-                        newYearSent = true;
+                        newYearSent = now.getHour();
                     }
                     return;
                 }
