@@ -287,9 +287,9 @@ public class BeyleyChan extends BotClient {
             public void run() {
                 LocalDateTime now = LocalDateTime.now();
 
-                if (now.getHour() > 15 && now.getHour() < 19) {
+                if (now.getDayOfYear() == 1) {
                     packetSender.updateStatus(SendUserStatusPacket.PLAYING,
-                            "nothing, but cuddling eevee till they fall asleep, cus cuties need sleep");
+                            "nothing while cuddling everyone to celebrate the new year!");
 
                     return;
                 }
