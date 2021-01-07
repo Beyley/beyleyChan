@@ -9,10 +9,12 @@ public class App {
     public static void main(String[] args) {
         Config cfg = new Config();
 
-        try {
-            new Thread(() -> {
-                BeyleyChan flanchoBot = new BeyleyChan(cfg.getProperty("userName"), cfg.getProperty("userPassword"), '@');
+        BeyleyChan flanchoBot = new BeyleyChan(cfg.getProperty("userName"), cfg.getProperty("userPassword"), '@');
 
+        Thread botThread = new Thread();
+
+        try {
+            botThread = new Thread(() -> {
                 flanchoBot.showLocationData = true;
                 flanchoBot.ip = cfg.getProperty("ip");
 
@@ -21,13 +23,39 @@ public class App {
                 } catch (InterruptedException | IOException | ParseException e) {
                     e.printStackTrace();
                 }
-            }).start();
+            });
+
+            botThread.start();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         Scanner scanner = new Scanner(System.in);
-        scanner.nextLine();
+
+        while (true) {
+            String nextMessage = scanner.nextLine();
+
+            if (nextMessage.equals("stopbot")) {
+                flanchoBot.packetSender.sendMessage(flanchoBot.username, "Bot is shutting down!", "#osu");
+
+                break;
+            }
+
+            if (flanchoBot.authenticated)
+                flanchoBot.packetSender.sendMessage(flanchoBot.username, nextMessage, "#osu");
+        }
+
+        flanchoBot.disconnect();
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+        }
+
+        botThread.stop();
+
         scanner.close();
+
+        System.exit(0);
     }
 }
