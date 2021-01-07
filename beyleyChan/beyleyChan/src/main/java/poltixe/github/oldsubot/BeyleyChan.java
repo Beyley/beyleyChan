@@ -91,9 +91,24 @@ public class BeyleyChan extends BotClient {
 
         // Schedule the keepalive / userstatus packet
         this.userStatusTimer.scheduleAtFixedRate(new TimerTask() {
+            int newYearSent = -1;
+
             @Override
             public void run() {
                 LocalDateTime now = LocalDateTime.now();
+
+                if (now.getDayOfYear() == 1) {
+                    packetSender.updateStatus(SendUserStatusPacket.PLAYING,
+                            "nothing while cuddling everyone to celebrate the new year!");
+
+                    if (newYearSent != now.getHour()) {
+                        packetSender.sendMessage(username,
+                                "Happy new year everyone! Hope everyone gets lots of cuddles and hugs this year!",
+                                "#osu");
+                        newYearSent = now.getHour();
+                    }
+                    return;
+                }
 
                 if (now.getHour() > 15 && now.getHour() < 19) {
                     packetSender.updateStatus(SendUserStatusPacket.PLAYING,
@@ -390,11 +405,6 @@ public class BeyleyChan extends BotClient {
     }
 
     @Override
-    public void onMessage(String arg0, String arg1, String arg2) {
-        // TODO Auto-generated method stub
-    }
-
-    @Override
     public void onBotDisconnect() {
         try {
             this.getTop11Timer.cancel();
@@ -405,5 +415,11 @@ public class BeyleyChan extends BotClient {
 
         this.getTop11Timer = new Timer();
         this.userStatusTimer = new Timer();
+    }
+
+    @Override
+    public void onMessage(String sender, String target, String message) {
+        // TODO Auto-generated method stub
+
     }
 }
