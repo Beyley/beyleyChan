@@ -10,7 +10,7 @@ public class Config {
         try {
             configFile.load(this.getClass().getClassLoader().getResourceAsStream("config.cfg"));
         } catch (Exception eta) {
-            eta.printStackTrace();
+            //eta.printStackTrace();
         }
     }
 

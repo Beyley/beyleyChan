@@ -21,13 +21,13 @@ public class App {
                 try {
                     flanchoBot.initialize();
                 } catch (InterruptedException | IOException | ParseException e) {
-                    e.printStackTrace();
+                    // e.printStackTrace();
                 }
             });
 
             botThread.start();
         } catch (Exception e) {
-            e.printStackTrace();
+            // e.printStackTrace();
         }
 
         Scanner scanner = new Scanner(System.in);

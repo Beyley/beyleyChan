@@ -29,7 +29,7 @@ public class BeyleyChan extends BotClient {
 
     @Override
     public void onAuthComplete() {
-        this.packetSender = new PacketSender(client);
+        this.packetSender = new PacketSender(client, console);
 
         packetSender.updateStatus(SendUserStatusPacket.PLAYING, "with Flan-chan in the fields!");
 
@@ -227,7 +227,6 @@ public class BeyleyChan extends BotClient {
                     try {
                         response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
 
-                        // print response body
                         json = response.body();
                     } catch (IOException | InterruptedException ex) {
                         this.console.printError(String.format(

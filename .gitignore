@@ -15,3 +15,6 @@ flanchoBotLibrary/
 .project
 config.cfg
 .settings/
+irclog.txt
+packetlog.txt
+errorlog.txt
