@@ -419,7 +419,6 @@ public class BeyleyChan extends BotClient {
 
     @Override
     public void onMessage(String sender, String target, String message) {
-        // TODO Auto-generated method stub
 
     }
 }

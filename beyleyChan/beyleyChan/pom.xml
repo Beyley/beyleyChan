@@ -19,8 +19,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>poltixe.github.flanchoBotLibrary</groupId>
-      <artifactId>flanchoBotLibrary</artifactId>
+      <groupId>poltixe.github.flanchobotlibrary</groupId>
+      <artifactId>flanchobotlibrary</artifactId>
       <version>1.0</version>
     </dependency>
 
