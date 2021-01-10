@@ -73,7 +73,7 @@ public class BeyleyChan extends BotClient {
                                 User newUser = oldsuTopPlayers[i];
 
                                 packetSender.sendMessage(username,
-                                        String.format("%s has overtaken %s for rank %,.0f with a %,.0f score play!",
+                                        String.format("%s has overtaken %s for rank #%,.0f with a %,.0f score play!",
                                                 newUser.username, oldUser.username, (double) newUser.rank,
                                                 (double) newUser.rankedScore - oldUserArray[i + 1].rankedScore),
                                         "#osu");
@@ -220,7 +220,7 @@ public class BeyleyChan extends BotClient {
     }
 
     @Override
-    public void onCommandMessage(String sender, String target, String command, String arguments) {
+    public void onCommandMessage(String sender, String target, String command, String[] arguments) {
         try {
             switch (command) {
                 case "help":
@@ -319,8 +319,8 @@ public class BeyleyChan extends BotClient {
 
                     String usernameToCheck = sender;
 
-                    if (arguments.length() > 3) {
-                        usernameToCheck = arguments.strip();
+                    if (arguments.length > 0) {
+                        usernameToCheck = String.join(" ", arguments).strip();
                     }
 
                     while (allUsers.hasNext()) {
