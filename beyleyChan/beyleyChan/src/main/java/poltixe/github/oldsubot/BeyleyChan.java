@@ -117,12 +117,12 @@ public class BeyleyChan extends BotClient {
                     return;
                 }
 
-                int randomNumber = rand.nextInt(21);
+                int randomNumber = rand.nextInt(25);
 
                 switch (randomNumber) {
                     case 0:
                         packetSender.updateStatus(SendUserStatusPacket.Status.PLAYING.value,
-                                "with Flan-chan in the fields!");
+                                "with Flan-chan and Statty in the fields!");
                         break;
                     case 1:
                         long jvmUpTime = Time.getJVMUptime();
@@ -197,6 +197,22 @@ public class BeyleyChan extends BotClient {
                         break;
                     case 20:
                         packetSender.updateStatus(SendUserStatusPacket.Status.PLAYING.value, "with ur bits, look down");
+                        break;
+                    case 21:
+                        packetSender.updateStatus(SendUserStatusPacket.Status.PLAYING.value,
+                                "with Statty! she kinda cute ><");
+                        break;
+                    case 22:
+                        packetSender.updateStatus(SendUserStatusPacket.Status.PAUSED.value,
+                                "her life thinking about eve ><");
+                        break;
+                    case 23:
+                        packetSender.updateStatus(SendUserStatusPacket.Status.PAUSED.value,
+                                "her life thinking about eevee ><");
+                        break;
+                    case 24:
+                        packetSender.updateStatus(SendUserStatusPacket.Status.PAUSED.value,
+                                "her life thinking about statty ><");
                         break;
                 }
             }
@@ -425,6 +441,16 @@ public class BeyleyChan extends BotClient {
 
     @Override
     public void onMessage(String sender, String target, String message) {
+        if (message.toLowerCase().contains("beyley")) {
+            try {
+                packetSender.sendMessage(this.username, String.format("Hello, %s.", sender), target);
+                Thread.sleep(2500);
+                packetSender.sendMessage(this.username, String.format("We know you're there.", sender), target);
+                Thread.sleep(2500);
+                packetSender.sendMessage(this.username, String.format("Respond to us.", sender), target);
+            } catch (InterruptedException ex) {
 
+            }
+        }
     }
 }
