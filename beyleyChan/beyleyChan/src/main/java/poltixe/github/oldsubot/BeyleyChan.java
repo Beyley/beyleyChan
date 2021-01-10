@@ -320,7 +320,7 @@ public class BeyleyChan extends BotClient {
                     String usernameToCheck = sender;
 
                     if (arguments.length() > 3) {
-                        usernameToCheck = arguments;
+                        usernameToCheck = arguments.strip();
                     }
 
                     while (allUsers.hasNext()) {
