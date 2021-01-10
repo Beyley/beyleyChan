@@ -317,10 +317,16 @@ public class BeyleyChan extends BotClient {
 
                     List<String> returnMessages = new ArrayList<String>();
 
+                    String usernameToCheck = sender;
+
+                    if (arguments.length() > 3) {
+                        usernameToCheck = arguments;
+                    }
+
                     while (allUsers.hasNext()) {
                         JSONObject user = (JSONObject) allUsers.next();
 
-                        if (user.get("username").equals(sender)) {
+                        if (user.get("username").equals(usernameToCheck)) {
                             int userAboveIndex = Integer.parseInt((String) user.get("rank")) - 2;
                             int userBelowIndex = Integer.parseInt((String) user.get("rank"));
 
