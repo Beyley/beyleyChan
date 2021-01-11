@@ -5,8 +5,6 @@ import java.util.*;
 
 import org.json.simple.parser.ParseException;
 
-import static spark.Spark.*;
-
 public class App {
     public static void main(String[] args) {
         Config cfg = new Config();
@@ -31,14 +29,6 @@ public class App {
         } catch (Exception e) {
             // e.printStackTrace();
         }
-
-        port(81);
-
-        WebHandler handler = new WebHandler(flanchoBot);
-
-        get("/", (req, res) -> handler.homePage(req));
-        get("/pagedata", (req, res) -> handler.homePageData(req));
-        post("/pagedata", (req, res) -> handler.homePageData(req));
 
         Scanner scanner = new Scanner(System.in);
 
