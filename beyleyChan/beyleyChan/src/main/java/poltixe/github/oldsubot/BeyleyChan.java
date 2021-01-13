@@ -33,6 +33,16 @@ public class BeyleyChan extends BotClient {
 
         packetSender.updateStatus(SendUserStatusPacket.Status.PLAYING.value, "with Flan-chan in the fields!");
 
+        startBeyleyTimers();
+    }
+
+    public void startBeyleyTimers() {
+        this.getTop11Timer.cancel();
+        this.userStatusTimer.cancel();
+
+        this.getTop11Timer = new Timer();
+        this.userStatusTimer = new Timer();
+
         // Schedule the user rank check
         this.getTop11Timer.scheduleAtFixedRate(new TimerTask() {
             @Override
