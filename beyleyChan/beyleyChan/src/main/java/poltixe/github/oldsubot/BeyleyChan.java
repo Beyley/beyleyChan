@@ -97,7 +97,7 @@ public class BeyleyChan extends BotClient {
                             "Caught error while updating top 11 players! Error message : " + ex.getMessage());
                 }
             }
-        }, 0, 10000);
+        }, 0, 20000);
 
         // Schedule the keepalive / userstatus packet
         this.userStatusTimer.scheduleAtFixedRate(new TimerTask() {
