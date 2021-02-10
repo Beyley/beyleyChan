@@ -29,7 +29,7 @@ public class BeyleyChan extends BotClient {
 
     @Override
     public void onAuthComplete() {
-        this.packetSender = new PacketSender(client, console);
+        // this.packetSender = new PacketSender(client, console);
 
         packetSender.updateStatus(SendUserStatusPacket.Status.PLAYING.value, "with Flan-chan in the fields!");
 
