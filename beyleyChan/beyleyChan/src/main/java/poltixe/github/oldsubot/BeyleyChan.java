@@ -120,12 +120,12 @@ public class BeyleyChan extends BotClient {
                     return;
                 }
 
-                if (now.getHour() > 15 && now.getHour() < 19) {
-                    packetSender.updateStatus(SendUserStatusPacket.Status.PLAYING.value,
-                            "nothing, but cuddling eevee till they fall asleep, cus cuties need sleep");
-
-                    return;
-                }
+                // if (now.getHour() > 15 && now.getHour() < 19) {
+                // packetSender.updateStatus(SendUserStatusPacket.Status.PLAYING.value,
+                // "nothing, but cuddling eevee till they fall asleep, cus cuties need sleep");
+                //
+                // return;
+                // }
 
                 int randomNumber = rand.nextInt(25);
 
@@ -248,7 +248,7 @@ public class BeyleyChan extends BotClient {
                     }
 
                     break;
-                case "top10a":
+                case "top10":
                     HttpClient httpClient = HttpClient.newHttpClient();
                     HttpRequest request = HttpRequest.newBuilder()
                             .uri(URI.create("https://oldsu.ayyeve.xyz/api/global_leaderboard/")).build();
