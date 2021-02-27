@@ -6,13 +6,16 @@ import java.net.http.*;
 import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.lang.reflect.*;
 
 import org.json.simple.*;
 import org.json.simple.parser.*;
+import org.reflections.*;
 
 import poltixe.github.flanchobotlibrary.*;
 import poltixe.github.flanchobotlibrary.packets.*;
 import poltixe.github.flanchobotlibrary.shortcuts.Time;
+import poltixe.github.oldsubot.commands.*;
 
 public class BeyleyChan extends BotClient {
     User[] oldsuTopPlayers = new User[11];
@@ -232,213 +235,30 @@ public class BeyleyChan extends BotClient {
     @Override
     public void onCommandMessage(String sender, String target, String command, String[] arguments) {
         try {
-            switch (command) {
-                case "help":
-                    String[] HelpMessages = new String[] {
-                            "Hello! I'm Beyley-chan, PoltixeTheDerg's bot. (name literally comes from her real name lmao)",
-                            "Currently I'm in early stages of development so I can't do much yet!",
-                            "The currently Available commands are as following:",
-                            ": " + prefix + "top10 : Lists the top 10 players",
-                            ": " + prefix + "nextrank : Shows the required score to reach the next rank",
-                            ": " + prefix + "u : Shows basic stats about you",
-                            ": " + prefix + "help : You are currently looking at this!!" };
+            Reflections reflections = new Reflections("poltixe.github.oldsubot.commands");
+            Set<Class<? extends Command>> classes = reflections.getSubTypesOf(Command.class);
 
-                    for (String helpString : HelpMessages) {
-                        packetSender.sendMessage(username, helpString, target);
-                    }
+            for (Class<? extends Command> aClass : classes) {
+                System.out.println(aClass.getSimpleName());
 
-                    break;
-                case "top10":
-                    HttpClient httpClient = HttpClient.newHttpClient();
-                    HttpRequest request = HttpRequest.newBuilder()
-                            .uri(URI.create("https://oldsu.ayyeve.xyz/api/global_leaderboard/")).build();
+                if (command.equals(aClass.getSimpleName())) {
+                    Command commandToRun = aClass
+                            .getDeclaredConstructor(String.class, String.class, String.class, String[].class)
+                            .newInstance(sender, target, command, arguments);
 
-                    HttpResponse<String> response = null;
+                    System.out.println(commandToRun.command);
 
-                    String json = "";
-
-                    try {
-                        response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                        json = response.body();
-                    } catch (IOException | InterruptedException ex) {
-                        this.console.printError(String.format(
-                                "Error getting top 10 players! Sender:%s Target:%s Command:%s Arguments:%s     Error:%s",
-                                sender, target, command, arguments, ex.getMessage()));
-                    }
-
-                    Object paresdJson = new JSONParser().parse(json);
-
-                    JSONObject jo = (JSONObject) paresdJson;
-
-                    JSONArray ja = (JSONArray) jo.get("users");
-
-                    Iterator<?> allUsers = ja.iterator();
-
-                    long lastScore = Long.parseLong((String) ((JSONObject) ja.get(0)).get("ranked_score"));
-
-                    String returnMessage = "";
-
-                    for (int i = 0; i < 10; i++) {
-                        StringBuffer playerUsername = new StringBuffer(
-                                (String) ((JSONObject) ja.get(i)).get("username"));
-
-                        returnMessage = String.format("#%s | %s | Score:%,.0f",
-                                (String) ((JSONObject) ja.get(i)).get("rank"), playerUsername.toString(),
-                                Double.parseDouble((String) ((JSONObject) ja.get(i)).get("ranked_score")));
-
-                        if (i > 0) {
-                            returnMessage += String.format(" - %,.0f score behind", (double) lastScore
-                                    - Double.parseDouble((String) ((JSONObject) ja.get(i)).get("ranked_score")));
-                        }
-
-                        lastScore = Long.parseLong((String) ((JSONObject) ja.get(i)).get("ranked_score"));
-
-                        packetSender.sendMessage(username, returnMessage, target);
-                    }
-
-                    break;
-                case "u":
-                    httpClient = HttpClient.newHttpClient();
-                    request = HttpRequest.newBuilder()
-                            .uri(URI.create("https://oldsu.ayyeve.xyz/api/global_leaderboard/")).build();
-
-                    response = null;
-
-                    json = "";
-
-                    try {
-                        response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                        json = response.body();
-                    } catch (IOException | InterruptedException ex) {
-                        this.console.printError(String.format(
-                                "Error getting players info! Sender:%s Target:%s Command:%s Arguments:%s     Error:%s",
-                                sender, target, command, arguments, ex.getMessage()));
-                    }
-
-                    paresdJson = new JSONParser().parse(json);
-
-                    jo = (JSONObject) paresdJson;
-
-                    ja = (JSONArray) jo.get("users");
-
-                    allUsers = ja.iterator();
-
-                    List<String> returnMessages = new ArrayList<String>();
-
-                    String usernameToCheck = sender;
-
-                    if (arguments.length > 0) {
-                        usernameToCheck = String.join(" ", arguments).strip();
-                    }
-
-                    while (allUsers.hasNext()) {
-                        JSONObject user = (JSONObject) allUsers.next();
-
-                        if (user.get("username").equals(usernameToCheck)) {
-                            int userAboveIndex = Integer.parseInt((String) user.get("rank")) - 2;
-                            int userBelowIndex = Integer.parseInt((String) user.get("rank"));
-
-                            JSONObject userAbove = (JSONObject) ja.get(userAboveIndex);
-                            JSONObject userBelow = (JSONObject) ja.get(userBelowIndex);
-
-                            double userRank = Double.parseDouble((String) user.get("rank"));
-                            double userScore = Double.parseDouble((String) user.get("ranked_score"));
-
-                            double userAboveRank = Double.parseDouble((String) userAbove.get("rank"));
-                            double userAboveScore = Double.parseDouble((String) userAbove.get("ranked_score"));
-
-                            // double userBelowRank = Double.parseDouble((String) userBelow.get("rank"));
-                            double userBelowScore = Double.parseDouble((String) userBelow.get("ranked_score"));
-
-                            returnMessages.add(String.format("%s (#%,.0f) has %,.0f score!", user.get("username"),
-                                    userRank, userScore));
-
-                            if (userAboveScore - userScore < 5000000) {
-                                returnMessages.add(String.format(
-                                        "#%,.0f is only %,.0f score away! Set a few scores and gain a rank!",
-                                        userAboveRank, userAboveScore - userScore));
-                            }
-
-                            if (userScore - userBelowScore < 5000000) {
-                                returnMessages.add(String.format(
-                                        "%s is only %,.0f score away from you! Set a few scores and widen the gap!",
-                                        userBelow.get("username"), userScore - userBelowScore));
-                            }
-
-                            break;
-                        }
-                    }
-
-                    for (String thisReturnMessage : returnMessages) {
-                        packetSender.sendMessage(username, thisReturnMessage, target);
-                    }
-
-                    break;
-                // case "setStatus":
-                // SendPacket.updateStatus(Short.parseShort(message.split(" ")[1]), client);
-                // break;
-                case "nextrank":
-                    httpClient = HttpClient.newHttpClient();
-                    request = HttpRequest.newBuilder()
-                            .uri(URI.create("https://oldsu.ayyeve.xyz/api/global_leaderboard/")).build();
-
-                    response = null;
-
-                    json = "";
-
-                    try {
-                        response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
-
-                        json = response.body();
-
-                    } catch (IOException | InterruptedException ex) {
-                        this.console.printError(String.format(
-                                "Error getting players info! Sender:%s Target:%s Command:%s Arguments:%s     Error:%s",
-                                sender, target, command, arguments, ex.getMessage()));
-                    }
-
-                    paresdJson = new JSONParser().parse(json);
-
-                    jo = (JSONObject) paresdJson;
-
-                    ja = (JSONArray) jo.get("users");
-
-                    allUsers = ja.iterator();
-
-                    returnMessage = "";
-
-                    while (allUsers.hasNext()) {
-                        JSONObject user = (JSONObject) allUsers.next();
-
-                        if (user.get("username").equals(sender)) {
-                            if (Integer.parseInt((String) user.get("rank")) == 1) {
-                                returnMessage = "ShadowOfDark fuck you lmaooooo (jk luv ya <3)";
-
-                                break;
-                            }
-
-                            int userAboveIndex = Integer.parseInt((String) user.get("rank")) - 2;
-
-                            JSONObject userAbove = (JSONObject) ja.get(userAboveIndex);
-
-                            returnMessage = String.format("%s is %,.0f score above you!",
-                                    (String) userAbove.get("username"),
-                                    (Double.parseDouble((String) userAbove.get("ranked_score"))
-                                            - Double.parseDouble((String) user.get("ranked_score"))));
-                        }
-                    }
-
-                    packetSender.sendMessage(username, returnMessage, target);
-
-                    break;
-                default:
-                    packetSender.sendMessage(username,
-                            "That command does not exist! Type @help for a list of commands!", target);
-                    break;
+                    commandToRun.runCommand(this);
+                }
             }
-        } catch (ParseException e) {
+
+            if (classes.size() == 0)
+                packetSender.sendMessage(username, "That command does not exist! Type @help for a list of commands!",
+                        target);
+        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException e) {
+            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
