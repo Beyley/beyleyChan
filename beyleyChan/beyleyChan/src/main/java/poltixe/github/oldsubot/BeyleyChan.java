@@ -123,13 +123,6 @@ public class BeyleyChan extends BotClient {
                     return;
                 }
 
-                // if (now.getHour() > 15 && now.getHour() < 19) {
-                // packetSender.updateStatus(SendUserStatusPacket.Status.PLAYING.value,
-                // "nothing, but cuddling eevee till they fall asleep, cus cuties need sleep");
-                //
-                // return;
-                // }
-
                 int randomNumber = rand.nextInt(25);
 
                 switch (randomNumber) {
@@ -234,33 +227,38 @@ public class BeyleyChan extends BotClient {
 
     @Override
     public void onCommandMessage(String sender, String target, String command, String[] arguments) {
-        try {
-            Reflections reflections = new Reflections("poltixe.github.oldsubot.commands");
-            Set<Class<? extends Command>> classes = reflections.getSubTypesOf(Command.class);
+        BotClient client = this;
+        new Thread() {
+            public void run() {
+                try {
+                    Reflections reflections = new Reflections("poltixe.github.oldsubot.commands");
+                    Set<Class<? extends Command>> classes = reflections.getSubTypesOf(Command.class);
 
-            boolean didCommandRun = false;
-            for (Class<? extends Command> aClass : classes) {
+                    boolean didCommandRun = false;
+                    for (Class<? extends Command> aClass : classes) {
 
-                if (command.equals(aClass.getSimpleName())) {
-                    didCommandRun = true;
-                    Command commandToRun = aClass
-                            .getDeclaredConstructor(String.class, String.class, String.class, String[].class)
-                            .newInstance(sender, target, command, arguments);
+                        if (command.equals(aClass.getSimpleName())) {
+                            didCommandRun = true;
+                            Command commandToRun = aClass
+                                    .getDeclaredConstructor(String.class, String.class, String.class, String[].class)
+                                    .newInstance(sender, target, command, arguments);
 
-                    System.out.println(commandToRun.command);
+                            System.out.println(commandToRun.command);
 
-                    commandToRun.runCommand(this);
+                            commandToRun.runCommand(client);
+                        }
+                    }
+
+                    if (!didCommandRun)
+                        packetSender.sendMessage(username,
+                                "That command does not exist! Type @help for a list of commands!", target);
+                } catch (InstantiationException | IllegalAccessException | IllegalArgumentException
+                        | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+                    e.printStackTrace();
+                    System.out.println(e.getMessage());
                 }
             }
-
-            if (!didCommandRun)
-                packetSender.sendMessage(username, "That command does not exist! Type @help for a list of commands!",
-                        target);
-        } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
+        }.start();
     }
 
     @Override
@@ -278,16 +276,19 @@ public class BeyleyChan extends BotClient {
 
     @Override
     public void onMessage(String sender, String target, String message) {
-        if (message.toLowerCase().contains("beyley")) {
-            try {
-                packetSender.sendMessage(this.username, String.format("Hello, %s.", sender), target);
-                Thread.sleep(2500);
-                packetSender.sendMessage(this.username, String.format("We know you're there.", sender), target);
-                Thread.sleep(2500);
-                packetSender.sendMessage(this.username, String.format("Respond to us.", sender), target);
-            } catch (InterruptedException ex) {
-
+        new Thread() {
+            public void run() {
+                if (message.toLowerCase().contains("beyley")) {
+                    try {
+                        packetSender.sendMessage(username, String.format("Hello, %s.", sender), target);
+                        Thread.sleep(2500);
+                        packetSender.sendMessage(username, String.format("We know you're there.", sender), target);
+                        Thread.sleep(2500);
+                        packetSender.sendMessage(username, String.format("Respond to us.", sender), target);
+                    } catch (InterruptedException ex) {
+                    }
+                }
             }
-        }
+        }.start();
     }
 }
