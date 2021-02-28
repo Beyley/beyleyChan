@@ -238,10 +238,11 @@ public class BeyleyChan extends BotClient {
             Reflections reflections = new Reflections("poltixe.github.oldsubot.commands");
             Set<Class<? extends Command>> classes = reflections.getSubTypesOf(Command.class);
 
+            boolean didCommandRun = false;
             for (Class<? extends Command> aClass : classes) {
-                System.out.println(aClass.getSimpleName());
 
                 if (command.equals(aClass.getSimpleName())) {
+                    didCommandRun = true;
                     Command commandToRun = aClass
                             .getDeclaredConstructor(String.class, String.class, String.class, String[].class)
                             .newInstance(sender, target, command, arguments);
@@ -252,7 +253,7 @@ public class BeyleyChan extends BotClient {
                 }
             }
 
-            if (classes.size() == 0)
+            if (!didCommandRun)
                 packetSender.sendMessage(username, "That command does not exist! Type @help for a list of commands!",
                         target);
         } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
